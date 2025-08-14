@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ศูนย์เรียนรู้: บริหารความเสี่ยงและควบคุมภายใน">
+    <title>ศูนย์เรียนรู้: บริหารความเสี่ยงและควบคุมภายใน</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- ฟอนต์ Sarabun -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-50 text-gray-800" style="font-family: 'Sarabun', sans-serif;">
+
+    <!-- Header -->
+    <header class="bg-blue-800 text-white p-4 flex justify-between items-center">
+        <h1 class="text-xl font-bold">ศูนย์เรียนรู้</h1>
+        <button id="mobileMenuButton" class="md:hidden">☰</button>
+        <nav class="hidden md:flex gap-4">
+            <a href="#overview">ภาพรวม</a>
+            <a href="#coso">COSO</a>
+            <a href="#heatmap">Heatmap</a>
+            <a href="#faq">FAQ</a>
+        </nav>
+    </header>
+
+    <!-- Mobile Menu -->
+    <nav id="mobile-menu" class="hidden bg-blue-700 text-white p-4">
+        <a href="#overview" class="block">ภาพรวม</a>
+        <a href="#coso" class="block">COSO</a>
+        <a href="#heatmap" class="block">Heatmap</a>
+        <a href="#faq" class="block">FAQ</a>
+    </nav>
+
+    <!-- Main -->
+    <main class="p-6 space-y-8">
+        <!-- Overview -->
+        <section id="overview">
+            <h2 class="text-2xl font-bold">ภาพรวมความเสี่ยง</h2>
+            <canvas id="riskChart" width="400" height="200"></canvas>
+        </section>
+
+        <!-- FAQ -->
+        <section id="faq">
+            <h2 class="text-2xl font-bold">คำถามที่พบบ่อย</h2>
+            <div>
+                <button class="faq-question">ความเสี่ยงคืออะไร?</button>
+                <div class="faq-answer hidden">ความเสี่ยงคือ เหตุการณ์ที่อาจทำให้เกิดผลกระทบต่อเป้าหมายขององค์กร</div>
+            </div>
+            <div>
+                <button class="faq-question">การควบคุมภายในคืออะไร?</button>
+                <div class="faq-answer hidden">การควบคุมภายในคือ กระบวนการที่ช่วยให้องค์กรบรรลุวัตถุประสงค์และลดความเสี่ยง</div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Script -->
+    <script src="script.js"></script>
+</body>
+</html>

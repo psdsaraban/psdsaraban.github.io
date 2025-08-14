@@ -1,0 +1,15 @@
+/* FAQ Styles */
+.faq-question {
+    display: block;
+    padding: 10px;
+    background: #e2e8f0;
+    border-radius: 5px;
+    margin-top: 5px;
+    cursor: pointer;
+}
+
+.faq-answer {
+    padding: 10px;
+    background: #f8fafc;
+    border-left: 3px solid #3b82f6;
+}
