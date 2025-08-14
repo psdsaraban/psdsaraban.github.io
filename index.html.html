@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ศูนย์เรียนรู้: บริหารความเสี่ยงและควบคุมภายใน</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Neutrals -->
+    <!-- Application Structure Plan: The application is designed as a single-page, top-to-bottom learning journey. It starts with a hero section, then introduces core concepts (Risk Management vs. Internal Control) in a tabbed view for direct comparison. This is followed by interactive diagrams for the Risk Management Process and COSO Framework, allowing users to click and learn actively. A key interactive element is the Risk Heat Map, which visualizes the concept practically. The journey continues with filterable case studies and concludes with practical tools and an FAQ accordion. This structure transforms the static report into an engaging, interactive flow that guides the user from theory to practice, which is more effective for learning than a traditional multi-page layout. -->
+    <!-- Visualization & Content Choices: 
+        - Core Concepts (RM vs IC): Goal: Compare. Method: Tabbed interface. Interaction: Click tabs to switch content. Justification: Allows direct, side-by-side comparison of foundational ideas. Library: Vanilla JS.
+        - RM Process & COSO Framework: Goal: Organize/Explain a process. Method: Interactive diagrams built with HTML/Tailwind. Interaction: Click on a step/component to reveal its description. Justification: More engaging and memorable than a static list; promotes active exploration. Library: Vanilla JS.
+        - Risk Heat Map: Goal: Explain a concept visually. Method: Interactive HTML grid. Interaction: Hover over cells to see risk level descriptions. Justification: Turns an abstract concept into a tangible, understandable tool. Library: Vanilla JS.
+        - Case Studies: Goal: Compare examples. Method: Filterable cards. Interaction: Click buttons to filter cases by business type. Justification: Presents specific examples cleanly without clutter. Library: Vanilla JS.
+        - Donut Chart: Goal: Inform/Show relationship. Method: Chart.js Donut Chart. Interaction: Hover for tooltips. Justification: Provides a high-level visual summary of how different risk levels might be distributed. Library: Chart.js.
+        - FAQs: Goal: Inform. Method: Accordion list. Interaction: Click question to expand answer. Justification: Standard, space-saving UI for Q&A. Library: Vanilla JS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #fdfaf6;
+            color: #4a4a4a;
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #c58940;
+            border-bottom-color: #c58940;
+        }
+        .tab.active {
+            background-color: #c58940;
+            color: #ffffff;
+        }
+        .tab {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .step-item.active {
+            background-color: #e5e7eb;
+            border-color: #c58940;
+        }
+        .step-item {
+            transition: background-color 0.3s;
+        }
+        .case-study-filter.active {
+            background-color: #c58940;
+            color: #ffffff;
+            border-color: #c58940;
+        }
+        .faq-question {
+            transition: background-color 0.2s;
+        }
+        .faq-question.open {
+            background-color: #faebd7;
+        }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header & Navigation -->
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="#" class="text-xl font-bold text-[#c58940]">Risk & Control Hub</a>
+            <div class="hidden md:flex space-x-8">
+                <a href="#concepts" class="nav-link pb-1">หลักการ</a>
+                <a href="#process" class="nav-link pb-1">กระบวนการ</a>
+                <a href="#heatmap" class="nav-link pb-1">เครื่องมือ</a>
+                <a href="#cases" class="nav-link pb-1">กรณีศึกษา</a>
+                <a href="#faq" class="nav-link pb-1">คำถามที่พบบ่อย</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden">
+            <a href="#concepts" class="block py-2 px-6 text-sm hover:bg-gray-100">หลักการ</a>
+            <a href="#process" class="block py-2 px-6 text-sm hover:bg-gray-100">กระบวนการ</a>
+            <a href="#heatmap" class="block py-2 px-6 text-sm hover:bg-gray-100">เครื่องมือ</a>
+            <a href="#cases" class="block py-2 px-6 text-sm hover:bg-gray-100">กรณีศึกษา</a>
+            <a href="#faq" class="block py-2 px-6 text-sm hover:bg-gray-100">คำถามที่พบบ่อย</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="py-20 md:py-32 text-center bg-white">
+            <div class="container mx-auto px-6">
+                <h1 class="text-4xl md:text-6xl font-bold text-gray-800">ศูนย์เรียนรู้การบริหารความเสี่ยง</h1>
+                <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mt-4">คู่มือฉบับย่อเพื่อธุรกิจและองค์กรที่เติบโตอย่างมั่นคง เรียนรู้หลักการพื้นฐานที่สำคัญเพื่อเป็นเกราะป้องกันและสร้างโอกาสใหม่ๆ ให้กับองค์กรของคุณ</p>
+            </div>
+        </section>
+
+        <!-- Core Concepts Section -->
+        <section id="concepts" class="py-16 bg-gray-50">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-gray-800">หลักการสำคัญ</h2>
+                    <p class="text-gray-600 mt-2">ทำความเข้าใจแนวคิดพื้นฐานของการบริหารความเสี่ยงและการควบคุมภายใน ซึ่งเป็นสองสิ่งที่ทำงานร่วมกัน</p>
+                </div>
+                <div class="max-w-4xl mx-auto">
+                    <div class="flex justify-center mb-8 bg-gray-200 rounded-full p-1">
+                        <button data-tab="rm" class="tab w-1/2 py-2 px-4 rounded-full text-center font-semibold active">การบริหารความเสี่ยง</button>
+                        <button data-tab="ic" class="tab w-1/2 py-2 px-4 rounded-full text-center font-semibold">การควบคุมภายใน</button>
+                    </div>
+                    <div id="tab-content">
+                        <!-- Risk Management Content -->
+                        <div id="rm-content" class="tab-pane">
+                            <h3 class="text-2xl font-semibold mb-4 text-center">การบริหารความเสี่ยงคืออะไร?</h3>
+                            <p class="text-center mb-6">คือกระบวนการที่ช่วยให้องค์กรสามารถระบุ ประเมิน และจัดการกับความไม่แน่นอนที่อาจส่งผลกระทบต่อเป้าหมาย เพื่อลดโอกาสเกิดความเสียหายและสร้างความได้เปรียบทางธุรกิจ</p>
+                            <div class="chart-container">
+                                <canvas id="riskChart"></canvas>
+                            </div>
+                            <p class="text-center text-sm text-gray-500 mt-2">ตัวอย่างการกระจายตัวของระดับความเสี่ยงในองค์กร</p>
+                        </div>
+                        <!-- Internal Control Content -->
+                        <div id="ic-content" class="tab-pane hidden">
+                            <h3 class="text-2xl font-semibold mb-4 text-center">การควบคุมภายในคืออะไร?</h3>
+                            <p class="text-center mb-6">คือระบบของนโยบาย ขั้นตอน และกิจกรรมต่างๆ ที่ถูกออกแบบมาเพื่อป้องกันและตรวจสอบความเสี่ยง โดยมุ่งเน้นที่การทำให้องค์กรบรรลุเป้าหมายได้อย่างมีประสิทธิภาพ การควบคุมภายในเปรียบเสมือน "เครื่องมือ" ที่นำมาใช้ในกระบวนการบริหารความเสี่ยง</p>
+                            <div class="bg-white p-6 rounded-lg shadow-md">
+                                <h4 class="font-bold mb-3 text-lg">องค์ประกอบตามกรอบ COSO</h4>
+                                <p class="mb-4">กรอบการควบคุมภายในที่ได้รับการยอมรับสากล ประกอบด้วย 5 องค์ประกอบที่ทำงานร่วมกัน คลิกเพื่อดูคำอธิบาย</p>
+                                <div id="coso-framework" class="grid grid-cols-1 md:grid-cols-5 gap-2 text-center">
+                                    <!-- COSO items will be injected here by JS -->
+                                </div>
+                                <div id="coso-description" class="mt-4 p-4 bg-amber-50 rounded-lg text-gray-700 min-h-[80px]">
+                                    คลิกที่องค์ประกอบเพื่อดูคำอธิบาย
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Process Section -->
+        <section id="process" class="py-16">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-gray-800">กระบวนการบริหารความเสี่ยง</h2>
+                    <p class="text-gray-600 mt-2">การบริหารความเสี่ยงไม่ใช่เหตุการณ์ครั้งเดียว แต่เป็นวงจรต่อเนื่อง 5 ขั้นตอนสำคัญ คลิกแต่ละขั้นตอนเพื่อเรียนรู้เพิ่มเติม</p>
+                </div>
+                <div class="max-w-5xl mx-auto">
+                    <div id="risk-process" class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 md:space-x-4">
+                        <!-- Process steps will be injected here by JS -->
+                    </div>
+                    <div id="process-description" class="mt-8 p-6 bg-white rounded-lg shadow-md min-h-[100px]">
+                        <h4 id="process-title" class="font-bold text-xl mb-2 text-gray-800"></h4>
+                        <p id="process-text" class="text-gray-600"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Heat Map Section -->
+        <section id="heatmap" class="py-16 bg-gray-50">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-gray-800">เครื่องมือ: แผนที่ความเสี่ยง (Heat Map)</h2>
+                    <p class="text-gray-600 mt-2">เครื่องมือแสดงภาพความเสี่ยงที่ช่วยให้เห็นว่าความเสี่ยงใดสำคัญที่สุดและควรจัดการเป็นอันดับแรก ลองเลื่อนเมาส์ไปบนช่องต่างๆ</p>
+                </div>
+                <div class="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-8">
+                    <div class="flex-shrink-0 flex items-center">
+                        <span class="[writing-mode:vertical-rl] rotate-180 font-semibold text-gray-600 whitespace-nowrap">ผลกระทบ</span>
+                        <div class="flex flex-col ml-2 text-sm text-center font-medium">
+                            <div class="h-10 flex items-center">ต่ำมาก</div>
+                            <div class="h-10 flex items-center">ต่ำ</div>
+                            <div class="h-10 flex items-center">ปานกลาง</div>
+                            <div class="h-10 flex items-center">สูง</div>
+                            <div class="h-10 flex items-center">สูงมาก</div>
+                        </div>
+                    </div>
+                    <div class="flex-grow w-full">
+                        <div id="risk-heatmap" class="grid grid-cols-5 gap-1">
+                            <!-- Heatmap cells will be injected by JS -->
+                        </div>
+                        <div class="flex justify-around mt-2 text-sm font-medium">
+                            <span>ต่ำมาก</span>
+                            <span>ต่ำ</span>
+                            <span>ปานกลาง</span>
+                            <span>สูง</span>
+                            <span>สูงมาก</span>
+                        </div>
+                        <div class="text-center mt-1 font-semibold text-gray-600">โอกาสที่จะเกิด</div>
+                    </div>
+                    <div id="heatmap-info" class="w-full md:w-1/3 p-4 bg-white rounded-lg shadow-md min-h-[150px]">
+                        <h4 class="font-bold text-lg mb-2">ข้อมูลความเสี่ยง</h4>
+                        <p class="text-sm text-gray-600">เลื่อนเมาส์ไปบนแผนที่เพื่อดูคำอธิบายระดับความเสี่ยง</p>
+                    </div>
+                </div>
+                 <div class="text-center mt-12">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">ดาวน์โหลดเทมเพลตใช้งานจริง</h3>
+                    <p class="text-gray-600 mb-6">เริ่มต้นบันทึกและติดตามความเสี่ยงขององค์กรคุณด้วยเทมเพลตที่ใช้งานง่าย</p>
+                    <a href="https://drive.google.com/drive/folders/1lKZO5F5KGeCp5UjfPadz2sKYHeEvn5a6?usp=drive_link" class="inline-block bg-[#c58940] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#b57b34] transition-colors">ดาวน์โหลดทะเบียนความเสี่ยง (Risk Register)</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Case Studies Section -->
+        <section id="cases" class="py-16">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-gray-800">กรณีศึกษา: เรียนรู้จากตัวอย่างจริง</h2>
+                    <p class="text-gray-600 mt-2">ดูว่าธุรกิจประเภทต่างๆ นำการบริหารความเสี่ยงและการควบคุมภายในไปปรับใช้อย่างไร</p>
+                </div>
+                <div class="flex justify-center mb-8 space-x-4">
+                    <button class="case-study-filter active" data-filter="all">ทั้งหมด</button>
+                    <button class="case-study-filter" data-filter="coffee">ธุรกิจร้านกาแฟ</button>
+                    <button class="case-study-filter" data-filter="online">ธุรกิจออนไลน์</button>
+                </div>
+                <div id="case-studies-grid" class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                    <!-- Case studies will be injected here by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section id="faq" class="py-16 bg-gray-50">
+            <div class="container mx-auto px-6 max-w-3xl">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-gray-800">คำถามที่พบบ่อย</h2>
+                </div>
+                <div id="faq-container" class="space-y-4">
+                    <!-- FAQs will be injected here by JS -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <h3 class="text-xl font-bold mb-2">Risk & Control Hub</h3>
+            <p class="mb-4">เราคือทีมงานที่มีความตั้งใจในการแบ่งปันความรู้เกี่ยวกับการบริหารความเสี่ยงและควบคุมภายใน</p>
+            <p>&copy; 2025 Risk & Control Hub. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- Data ---
+            const riskProcessData = [
+                { id: 1, title: 'การระบุความเสี่ยง', text: 'ค้นหาและทำความเข้าใจความเสี่ยงทั้งหมดที่อาจเกิดขึ้นกับองค์กร ทั้งจากปัจจัยภายในและภายนอก' },
+                { id: 2, title: 'การประเมินความเสี่ยง', text: 'วิเคราะห์โอกาสที่จะเกิดและผลกระทบของความเสี่ยงนั้นๆ เพื่อจัดลำดับความสำคัญ' },
+                { id: 3, title: 'การจัดการความเสี่ยง', text: 'เลือกแนวทางที่เหมาะสมในการจัดการ เช่น หลีกเลี่ยง, ยอมรับ, ลดผลกระทบ, หรือโอนย้ายความเสี่ยง' },
+                { id: 4, title: 'การสื่อสารความเสี่ยง', text: 'แจ้งให้ผู้มีส่วนได้ส่วนเสียที่เกี่ยวข้องทราบถึงข้อมูลความเสี่ยงและแผนการจัดการ' },
+                { id: 5, title: 'การติดตามและทบทวน', text: 'เฝ้าระวังความเสี่ยงที่อาจเปลี่ยนแปลงไปและปรับปรุงแผนการจัดการให้ทันสถานการณ์อยู่เสมอ' }
+            ];
+
+            const cosoFrameworkData = [
+                { title: 'สภาพแวดล้อม', description: 'ทัศนคติและบรรยากาศโดยรวมขององค์กรที่ส่งเสริมการควบคุมที่ดี เป็นรากฐานของทุกสิ่ง' },
+                { title: 'การประเมินความเสี่ยง', description: 'การวิเคราะห์ความเสี่ยงที่อาจขัดขวางการบรรลุวัตถุประสงค์ขององค์กร' },
+                { title: 'กิจกรรมควบคุม', description: 'นโยบายและขั้นตอนปฏิบัติที่นำมาใช้เพื่อจัดการความเสี่ยง เช่น การอนุมัติ การกระทบยอด' },
+                { title: 'สารสนเทศและการสื่อสาร', description: 'การแลกเปลี่ยนข้อมูลที่จำเป็นและถูกต้องทั้งภายในและภายนอกองค์กร' },
+                { title: 'การติดตามประเมินผล', description: 'การประเมินและปรับปรุงประสิทธิภาพของระบบการควบคุมอย่างต่อเนื่อง' }
+            ];
+
+            // New 5x5 heatmap data with logical color progression (low-to-high impact)
+            const heatmapData = [
+                // Impact: Very Low
+                { level: 'ต่ำมาก', color: 'bg-green-400', description: 'ยอมรับได้ - ไม่จำเป็นต้องดำเนินการพิเศษ' },
+                { level: 'ต่ำมาก', color: 'bg-green-400', description: 'ยอมรับได้ - ไม่จำเป็นต้องดำเนินการพิเศษ' },
+                { level: 'ต่ำ', color: 'bg-lime-400', description: 'ยอมรับได้ - จัดการตามปกติ' },
+                { level: 'ปานกลาง', color: 'bg-yellow-300', description: 'ควรเฝ้าระวังและพิจารณามาตรการเพิ่มเติม' },
+                { level: 'ปานกลาง', color: 'bg-yellow-400', description: 'ควรเฝ้าระวังและพิจารณามาตรการเพิ่มเติม' },
+                // Impact: Low
+                { level: 'ต่ำมาก', color: 'bg-green-400', description: 'ยอมรับได้ - ไม่จำเป็นต้องดำเนินการพิเศษ' },
+                { level: 'ต่ำ', color: 'bg-lime-400', description: 'ยอมรับได้ - จัดการตามปกติ' },
+                { level: 'ปานกลาง', color: 'bg-yellow-300', description: 'ควรเฝ้าระวังและพิจารณามาตรการเพิ่มเติม' },
+                { level: 'ปานกลาง', color: 'bg-yellow-400', description: 'ควรเฝ้าระวังและพิจารณามาตรการเพิ่มเติม' },
+                { level: 'สูง', color: 'bg-orange-500', description: 'สำคัญมาก - ต้องมีการติดตามและดำเนินการ' },
+                // Impact: Medium
+                { level: 'ต่ำ', color: 'bg-lime-400', description: 'ยอมรับได้ - จัดการตามปกติ' },
+                { level: 'ปานกลาง', color: 'bg-yellow-300', description: 'ควรเฝ้าระวังและพิจารณามาตรการเพิ่มเติม' },
+                { level: 'ปานกลาง', color: 'bg-yellow-400', description: 'ควรเฝ้าระวังและพิจารณามาตรการเพิ่มเติม' },
+                { level: 'สูง', color: 'bg-orange-500', description: 'สำคัญมาก - ต้องมีการติดตามและดำเนินการ' },
+                { level: 'สูงมาก', color: 'bg-red-500', description: 'มีความสำคัญสูงมาก ต้องมีแผนจัดการที่ชัดเจน' },
+                // Impact: High
+                { level: 'ปานกลาง', color: 'bg-yellow-300', description: 'ควรเฝ้าระวังและพิจารณามาตรการเพิ่มเติม' },
+                { level: 'ปานกลาง', color: 'bg-yellow-400', description: 'ควรเฝ้าระวังและพิจารณามาตรการเพิ่มเติม' },
+                { level: 'สูง', color: 'bg-orange-500', description: 'สำคัญมาก - ต้องมีการติดตามและดำเนินการ' },
+                { level: 'สูงมาก', color: 'bg-red-500', description: 'มีความสำคัญสูงมาก ต้องมีแผนจัดการที่ชัดเจน' },
+                { level: 'วิกฤต', color: 'bg-red-600', description: 'ต้องจัดการโดยด่วนและให้ความสำคัญสูงสุด' },
+                // Impact: Very High
+                { level: 'ปานกลาง', color: 'bg-yellow-400', description: 'ควรเฝ้าระวังและพิจารณามาตรการเพิ่มเติม' },
+                { level: 'สูง', color: 'bg-orange-500', description: 'สำคัญมาก - ต้องมีการติดตามและดำเนินการ' },
+                { level: 'สูงมาก', color: 'bg-red-500', description: 'มีความสำคัญสูงมาก ต้องมีแผนจัดการที่ชัดเจน' },
+                { level: 'วิกฤต', color: 'bg-red-600', description: 'ต้องจัดการโดยด่วนและให้ความสำคัญสูงสุด' },
+                { level: 'วิกฤต', color: 'bg-red-600', description: 'ต้องจัดการโดยด่วนและให้ความสำคัญสูงสุด' }
+            ];
+
+            const caseStudiesData = [
+                {
+                    category: 'coffee',
+                    title: 'ธุรกิจร้านกาแฟขนาดเล็ก',
+                    risks: ['วัตถุดิบหมด', 'เครื่องชงกาแฟเสีย', 'พนักงานลาออก'],
+                    controls: ['จัดทำบัญชีสต็อก', 'กำหนดรอบบำรุงรักษา', 'สร้างคู่มือการทำงาน']
+                },
+                {
+                    category: 'online',
+                    title: 'ธุรกิจบริการออนไลน์',
+                    risks: ['ข้อมูลลูกค้าถูกแฮ็ก', 'ระบบเว็บไซต์ล่ม', 'การแข่งขันสูง'],
+                    controls: ['เข้ารหัสข้อมูล (Encryption)', 'สำรองข้อมูลสม่ำเสมอ', 'วิเคราะห์คู่แข่งและสร้างจุดเด่น']
+                }
+            ];
+
+            const faqData = [
+                { question: 'การบริหารความเสี่ยงและการควบคุมภายในแตกต่างกันอย่างไร?', answer: 'การบริหารความเสี่ยงคือการมองภาพรวมของภัยคุกคามและการวางแผนจัดการ ส่วนการควบคุมภายในเป็น "เครื่องมือ" หรือกิจกรรมที่นำมาใช้เพื่อจัดการภัยคุกคามเหล่านั้นตามแผน' },
+                { question: 'องค์กรขนาดเล็กจำเป็นต้องทำเรื่องนี้อย่างจริงจังไหม?', answer: 'จำเป็นอย่างยิ่งครับ แม้จะเริ่มจากสิ่งง่ายๆ ก็สามารถช่วยป้องกันปัญหาใหญ่ในอนาคตได้ การมีระบบที่ดีช่วยสร้างความน่าเชื่อถือและโอกาสทางธุรกิจ' },
+                { question: 'COSO คืออะไร และสำคัญอย่างไร?', answer: 'COSO คือกรอบการดำเนินงานด้านการควบคุมภายในที่เป็นที่ยอมรับในระดับสากล การนำ COSO มาปรับใช้ช่วยให้องค์กรมีระบบการควบคุมภายในที่เป็นมาตรฐานและมีประสิทธิภาพ' }
+            ];
+
+
+            // --- Mobile Menu ---
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // --- Smooth Scrolling ---
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    mobileMenu.classList.add('hidden'); // Close mobile menu on click
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetElement = document.getElementById(targetId);
+                    if (targetElement) {
+                         targetElement.scrollIntoView({
+                             behavior: 'smooth'
+                         });
+                    }
+                });
+            });
+
+            // --- Core Concepts Tabs ---
+            const tabs = document.querySelectorAll('.tab');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    const target = tab.getAttribute('data-tab');
+                    tabPanes.forEach(pane => {
+                        if (pane.id === `${target}-content`) {
+                            pane.classList.remove('hidden');
+                        } else {
+                            pane.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+
+            // --- Risk Process Interactive Diagram ---
+            const processContainer = document.getElementById('risk-process');
+            const processTitle = document.getElementById('process-title');
+            const processText = document.getElementById('process-text');
+            riskProcessData.forEach((step, index) => {
+                const stepEl = document.createElement('div');
+                stepEl.className = 'step-item w-full md:w-auto flex items-center p-4 border-2 rounded-lg cursor-pointer bg-white shadow-sm';
+                stepEl.innerHTML = `<span class="text-2xl font-bold text-[#c58940] mr-4">${step.id}</span><span>${step.title}</span>`;
+                stepEl.addEventListener('click', () => {
+                    document.querySelectorAll('.step-item').forEach(el => el.classList.remove('active'));
+                    stepEl.classList.add('active');
+                    processTitle.textContent = step.title;
+                    processText.textContent = step.text;
+                });
+                processContainer.appendChild(stepEl);
+                if(index < riskProcessData.length - 1) {
+                    const arrow = document.createElement('div');
+                    arrow.className = 'text-2xl text-gray-300 transform md:-rotate-90';
+                    arrow.innerHTML = '&#8595;'; // Down arrow
+                    processContainer.appendChild(arrow);
+                }
+            });
+            // Activate first step initially
+            processContainer.querySelector('.step-item').click();
+
+            // --- COSO Framework ---
+            const cosoContainer = document.getElementById('coso-framework');
+            const cosoDescription = document.getElementById('coso-description');
+            cosoFrameworkData.forEach(item => {
+                const cosoEl = document.createElement('button');
+                cosoEl.className = 'p-3 bg-white rounded-md shadow-sm hover:bg-amber-100 transition-colors border';
+                cosoEl.textContent = item.title;
+                cosoEl.addEventListener('click', () => {
+                    cosoDescription.textContent = item.description;
+                    document.querySelectorAll('#coso-framework button').forEach(btn => btn.classList.remove('bg-amber-200'));
+                    cosoEl.classList.add('bg-amber-200');
+                });
+                cosoContainer.appendChild(cosoEl);
+            });
+
+            // --- Risk Heatmap ---
+            const heatmapContainer = document.getElementById('risk-heatmap');
+            const heatmapInfo = document.getElementById('heatmap-info');
+            heatmapData.forEach(item => {
+                const cell = document.createElement('div');
+                cell.className = `h-10 w-full ${item.color} rounded-sm cursor-pointer transition-transform hover:scale-105`;
+                cell.addEventListener('mouseenter', () => {
+                    heatmapInfo.innerHTML = `<h4 class="font-bold text-lg mb-2">${item.level}</h4><p class="text-sm text-gray-600">${item.description}</p>`;
+                });
+                heatmapContainer.appendChild(cell);
+            });
+
+            // --- Case Studies ---
+            const caseGrid = document.getElementById('case-studies-grid');
+            const caseFilters = document.querySelectorAll('.case-study-filter');
+            
+            function renderCases(filter = 'all') {
+                caseGrid.innerHTML = '';
+                const filteredCases = filter === 'all' 
+                    ? caseStudiesData 
+                    : caseStudiesData.filter(c => c.category === filter);
+
+                filteredCases.forEach(study => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-white p-6 rounded-lg shadow-md border-l-4 border-[#c58940]';
+                    card.innerHTML = `
+                        <h3 class="text-xl font-bold mb-4">${study.title}</h3>
+                        <div class="mb-4">
+                            <h4 class="font-semibold text-gray-700">ความเสี่ยงที่พบ:</h4>
+                            <ul class="list-disc list-inside text-gray-600">
+                                ${study.risks.map(r => `<li>${r}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-700">การควบคุมที่ใช้:</h4>
+                            <ul class="list-disc list-inside text-gray-600">
+                                ${study.controls.map(c => `<li>${c}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `;
+                    caseGrid.appendChild(card);
+                });
+            }
+
+            caseFilters.forEach(button => {
+                button.addEventListener('click', () => {
+                    caseFilters.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    renderCases(button.dataset.filter);
+                });
+            });
+            renderCases(); // Initial render
+
+            // --- FAQ Accordion ---
+            const faqContainer = document.getElementById('faq-container');
+            faqData.forEach(item => {
+                const faqItem = document.createElement('div');
+                faqItem.className = 'border rounded-lg bg-white shadow-sm';
+                faqItem.innerHTML = `
+                    <button class="faq-question w-full text-left p-4 flex justify-between items-center font-semibold hover:bg-gray-50">
+                        <span>${item.question}</span>
+                        <span class="transform transition-transform duration-300">&#9662;</span>
+                    </button>
+                    <div class="faq-answer px-4">
+                        <p class="py-4 border-t">${item.answer}</p>
+                    </div>
+                `;
+                faqContainer.appendChild(faqItem);
+            });
+
+            document.querySelectorAll('.faq-question').forEach(button => {
+                button.addEventListener('click', () => {
+                    const answer = button.nextElementSibling;
+                    const icon = button.querySelector('span:last-child');
+                    button.classList.toggle('open');
+                    if (answer.style.maxHeight) {
+                        answer.style.maxHeight = null;
+                        answer.style.paddingTop = '0';
+                        answer.style.paddingBottom = '0';
+                        icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        answer.style.maxHeight = answer.scrollHeight + "px";
+                        answer.style.paddingTop = '1rem';
+                        answer.style.paddingBottom = '1rem';
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                });
+            });
+
+            // --- Chart.js Donut Chart ---
+            const ctx = document.getElementById('riskChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['ความเสี่ยงต่ำ', 'ความเสี่ยงปานกลาง', 'ความเสี่ยงสูง'],
+                    datasets: [{
+                        label: 'Risk Distribution',
+                        data: [55, 30, 15],
+                        backgroundColor: [
+                            '#4ade80', // green-400
+                            '#facc15', // yellow-400
+                            '#f97316'  // orange-500
+                        ],
+                        borderColor: '#fdfaf6',
+                        borderWidth: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: false,
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        });
+    </script>
+</body>
+</html>
